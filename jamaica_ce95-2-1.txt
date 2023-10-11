@@ -1,0 +1,149 @@
+Caribbean Sclerosponge Carbon Isotope Data: Readme file
+---------------------------------------------------------------------
+                NOAA Paleoclimatology Program
+                               and
+         World Data Center for Paleoclimatology, Boulder
+---------------------------------------------------------------------
+NOTE: PLEASE CITE ORIGINAL REFERENCE WHEN USING THIS DATA!!!!!
+
+NAME OF DATA SET: Caribbean Sclerosponge Carbon Isotope Data
+LAST UPDATE: 4/2002 (Original Receipt by WDC Paleo)
+
+CONTRIBUTORS: Florian Böhm, Alexandra Haase-Schramm, Anton Eisenhauer,
+Michael Joachimski, Wolf-Christian Dullo, Joachim Reitner, Helmut Lehnert
+
+IGBP PAGES/WDCA CONTRIBUTION SERIES NUMBER: 2002-020
+
+SUGGESTED DATA CITATION: Böhm, F. et al., 2002,
+Caribbean Sclerosponge Carbon Isotope Data,
+IGBP PAGES/World Data Center for Paleoclimatology
+Data Contribution Series #2002-020.
+NOAA/NGDC Paleoclimatology Program, Boulder CO, USA.
+
+ORIGINAL REFERENCES:
+Böhm, F., A. Haase-Schramm, A. Eisenhauer, W.-C. Dullo, M. M. Joachimski,
+H. Lehnert, and J. Reitner, 2002.
+Evidence for preindustrial variations in the marine surface water
+carbonate system from coralline sponges,
+Geochem. Geophys. Geosyst., 3(3), 10.1029/2001GC000264.
+http://g-cubed.org/gc2002/2001GC000264/
+
+Böhm, F., Joachimski, M.M., Lehnert, H., Morgenroth, W., Kretschmer, J.,
+Vacelet, J., Dullo, W.-Chr. (1996): Carbon isotope records from extant
+Caribbean and South Pacific sponges:
+Evolution of d13C in surface water DIC.
+Earth Planet. Sci. Lett., 139, 291-303
+
+GEOGRAPHIC REGION: Caribbean Sea; Jamaica and Pedro Bank
+PERIOD OF RECORD: 1368 - 1995 AD
+
+LIST OF FILES: Readme_caribbean.txt (this file),
+pedro_bank_392-19.txt, jamaica_ce145.txt, jamaica_ce95-2-1.txt,
+jamaica_ce95-2-2.txt, jamaica_ce96-1.txt,
+(tab-delimited ASCII text format).
+
+DESCRIPTION:
+Carbon isotope values of sclerosponges (Ceratoporella nicholsoni) from
+Jamaica (Rio Bueno 18.48N, 77.45W, 20m Depth, and Montego Bay, 18.47N, 77.95W, 20m Depth)
+and Pedro Bank (17.53N, 78.95W, 125m Depth).
+
+Year AD	d13C
+1994	3.92
+1993	3.98
+1986	4.09
+1986	4.05
+1981	4.13
+1974	4.24
+1970	4.38
+1970	4.24
+1965	4.44
+1959	4.53
+1959	4.40
+1952	4.48
+1945	4.52
+1945	4.59
+1936	4.57
+1923	4.69
+1923	4.62
+1916	4.64
+1911	4.59
+1906	4.77
+1906	4.72
+1898	4.75
+1892	4.88
+1886	4.86
+1884	4.80
+1880	4.80
+1879	4.79
+1871	4.83
+1836	4.95
+1824	4.93
+1824	4.93
+1814	4.94
+1804	4.84
+1802	4.93
+1796	4.93
+1795	4.95
+1790	5.03
+1782	4.93
+1781	5.05
+1771	4.99
+1770	5.03
+1770	4.98
+1765	5.03
+1763	4.95
+1762	5.03
+1762	4.98
+1762	5.03
+1761	5.00
+1755	4.94
+1753	4.92
+1753	5.02
+1751	5.07
+1746	5.01
+1742	4.99
+1735	4.94
+1732	5.02
+1726	5.02
+1689	5.05
+1684	4.96
+1684	5.05
+1680	5.05
+1676	4.93
+1671	5.03
+1667	4.96
+1667	5.05
+1663	5.05
+1655	5.02
+1651	4.98
+1650	5.08
+1650	5.08
+1641	5.02
+1637	4.99
+1618	5.00
+1606	5.01
+1574	5.03
+1574	4.99
+1559	4.99
+1553	5.01
+1543	4.95
+1531	4.96
+1524	4.95
+1524	4.88
+1512	4.95
+1512	4.94
+1508	4.92
+1504	4.92
+1493	4.91
+1492	4.95
+1492	4.95
+1478	4.92
+1477	4.91
+1468	4.95
+1464	4.93
+1456	4.91
+1449	4.94
+1449	4.90
+1449	4.86
+1432	4.91
+1421	4.93

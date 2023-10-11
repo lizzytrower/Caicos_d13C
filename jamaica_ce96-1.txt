@@ -1,0 +1,234 @@
+Caribbean Sclerosponge Carbon Isotope Data: Readme file
+---------------------------------------------------------------------
+                NOAA Paleoclimatology Program
+                               and
+         World Data Center for Paleoclimatology, Boulder
+---------------------------------------------------------------------
+NOTE: PLEASE CITE ORIGINAL REFERENCE WHEN USING THIS DATA!!!!!
+
+NAME OF DATA SET: Caribbean Sclerosponge Carbon Isotope Data
+LAST UPDATE: 4/2002 (Original Receipt by WDC Paleo)
+
+CONTRIBUTORS: Florian Böhm, Alexandra Haase-Schramm, Anton Eisenhauer,
+Michael Joachimski, Wolf-Christian Dullo, Joachim Reitner, Helmut Lehnert
+
+IGBP PAGES/WDCA CONTRIBUTION SERIES NUMBER: 2002-020
+
+SUGGESTED DATA CITATION: Böhm, F. et al., 2002,
+Caribbean Sclerosponge Carbon Isotope Data,
+IGBP PAGES/World Data Center for Paleoclimatology
+Data Contribution Series #2002-020.
+NOAA/NGDC Paleoclimatology Program, Boulder CO, USA.
+
+ORIGINAL REFERENCES:
+Böhm, F., A. Haase-Schramm, A. Eisenhauer, W.-C. Dullo, M. M. Joachimski,
+H. Lehnert, and J. Reitner, 2002.
+Evidence for preindustrial variations in the marine surface water
+carbonate system from coralline sponges,
+Geochem. Geophys. Geosyst., 3(3), 10.1029/2001GC000264.
+http://g-cubed.org/gc2002/2001GC000264/
+
+Böhm, F., Joachimski, M.M., Lehnert, H., Morgenroth, W., Kretschmer, J.,
+Vacelet, J., Dullo, W.-Chr. (1996): Carbon isotope records from extant
+Caribbean and South Pacific sponges:
+Evolution of d13C in surface water DIC.
+Earth Planet. Sci. Lett., 139, 291-303
+
+GEOGRAPHIC REGION: Caribbean Sea; Jamaica and Pedro Bank
+PERIOD OF RECORD: 1368 - 1995 AD
+
+LIST OF FILES: Readme_caribbean.txt (this file),
+pedro_bank_392-19.txt, jamaica_ce145.txt, jamaica_ce95-2-1.txt,
+jamaica_ce95-2-2.txt, jamaica_ce96-1.txt,
+(tab-delimited ASCII text format).
+
+DESCRIPTION:
+Carbon isotope values of sclerosponges (Ceratoporella nicholsoni) from
+Jamaica (Rio Bueno 18.48N, 77.45W, 20m Depth, and Montego Bay, 18.47N, 77.95W, 20m Depth)
+and Pedro Bank (17.53N, 78.95W, 125m Depth).
+
+Year AD	d13C
+1995	3.93
+1986	4.03
+1982	4.05
+1977	4.23
+1971	4.28
+1967	4.38
+1960	4.41
+1954	4.49
+1947	4.47
+1940	4.53
+1932	4.55
+1926	4.61
+1921	4.57
+1915	4.64
+1909	4.58
+1904	4.65
+1899	4.63
+1894	4.69
+1889	4.67
+1883	4.68
+1878	4.72
+1873	4.79
+1869	4.77
+1864	4.77
+1864	4.80
+1860	4.76
+1855	4.78
+1850	4.79
+1845	4.78
+1840	4.85
+1835	4.89
+1830	4.88
+1826	4.90
+1822	4.93
+1818	4.89
+1813	4.98
+1808	4.96
+1805	4.92
+1800	4.90
+1795	4.93
+1780	4.95
+1776	4.88
+1771	4.90
+1766	4.92
+1761	4.94
+1757	4.86
+1754	4.91
+1748	4.98
+1744	4.95
+1740	5.02
+1736	4.99
+1731	5.05
+1727	4.97
+1723	4.97
+1719	5.03
+1716	4.96
+1707	5.06
+1707	5.03
+1703	5.04
+1699	5.02
+1695	5.07
+1691	5.04
+1687	4.98
+1684	5.06
+1684	5.07
+1679	5.04
+1676	5.06
+1673	5.00
+1669	5.00
+1665	4.98
+1662	5.01
+1658	5.05
+1656	4.98
+1652	4.97
+1649	4.99
+1646	5.03
+1642	5.01
+1639	5.04
+1636	5.01
+1633	5.01
+1630	5.01
+1627	5.01
+1627	5.05
+1625	5.03
+1624	5.02
+1622	5.00
+1621	5.05
+1619	4.99
+1617	5.05
+1616	5.06
+1616	5.05
+1614	5.04
+1612	5.05
+1610	5.04
+1606	4.97
+1604	4.95
+1601	5.00
+1598	4.94
+1595	4.98
+1593	4.98
+1590	4.95
+1587	4.97
+1585	5.01
+1582	4.95
+1580	4.96
+1577	4.96
+1575	4.94
+1572	4.95
+1570	4.93
+1568	4.93
+1565	4.92
+1561	4.95
+1557	4.90
+1554	4.92
+1552	4.90
+1550	4.91
+1547	4.91
+1544	4.88
+1542	4.92
+1539	4.90
+1537	4.93
+1534	4.91
+1531	4.84
+1528	4.91
+1525	4.90
+1522	4.88
+1519	4.91
+1519	4.89
+1516	4.94
+1514	4.89
+1511	4.83
+1511	4.81
+1509	4.87
+1505	4.87
+1503	4.84
+1499	4.86
+1496	4.83
+1494	4.89
+1491	4.86
+1488	4.89
+1485	4.87
+1483	4.90
+1480	4.90
+1478	4.99
+1478	4.99
+1475	4.89
+1472	4.95
+1469	4.93
+1466	4.94
+1463	4.92
+1460	4.95
+1460	4.93
+1458	5.00
+1458	5.01
+1455	4.92
+1452	4.95
+1450	4.85
+1447	4.92
+1445	4.93
+1442	4.93
+1440	4.89
+1436	4.90
+1433	4.97
+1432	4.90
+1428	4.91
+1425	4.91
+1422	4.91
+1420	4.95
+1416	4.95
+1413	4.93
+1411	4.94
+1408	4.95
+1405	4.89
+1402	4.90
+1399	4.91
+1397	4.90
+1393	4.91
+1390	4.88
+1386	4.95
+1383	4.92
+1378	4.94
+1375	4.95
+1371	4.90
+1368	4.91
