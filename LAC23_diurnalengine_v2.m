@@ -1,3 +1,18 @@
+%% Little Ambergris Cay diurnal engine + Suess effect evaluation
+% This code was written by Lizzy Trower in Matlab R2021b based on the
+% description of the diurnal engine model from Geyman and Maloof (2019). It
+% was last updated in October 2023.
+
+%This code requires a few additional functions to run: 
+%   *aragoniteinterp (which calculates k and n based on T, using Burton &
+%   Walter 1987
+%
+%   *seawaterdensity (which estimates seawater density as a function of T
+%   and salinity using data from Millero & Poisson 1981)
+%
+%   *CO2SYS, which can be downloaded at: 
+%   https://github.com/jonathansharp/CO2-System-Extd
+
 %% Part 1: load in data
 clear
 
@@ -16,6 +31,7 @@ hold on
 scatter(LAC23_P_data.DIC_mmol_kg_,LAC23_P_data.Alk_mequiv_kg_,[],...
     hours(time),'filled')
 box on
+xlim([1.96 2.14])
 axis equal
 ylabel('TA (mequiv/kg)')
 xlabel('[DIC] (mmol/kg)')
@@ -132,9 +148,11 @@ pH_model(1) = mean(LAC23_P_data.pH); %{dimensionless}
 Omega_ar_model = zeros(length(t_hr),1);
 Omega_ar_model(1) = mean(LAC23_P_data.Omega_ar_CO2SYS_);
 Fcarb_model = zeros(length(t_hr),1);
-Fcarb_model(1) = k_rate*(Omega_ar_model(1) - 1)^n_BR*10^6/waterdensity/waterdepth; %{umol/kg/hr}
+Fcarb_model(1) = k_rate*(Omega_ar_model(1) - 1)^n_BR*10^6/...
+    waterdensity/waterdepth; %{umol/kg/hr}
 Fgas_model = zeros(length(t_hr),1);
-Fgas_model(1) = kCO2*K0*(pCO2_model(1) - pCO2_atm)/waterdensity/waterdepth; %{umol/kg/hr}
+Fgas_model(1) = kCO2*K0*(pCO2_model(1) - pCO2_atm)/waterdensity/...
+    waterdepth; %{umol/kg/hr}
 d13C_DIC_model = zeros(length(t_hr),1);
 d13C_DIC_model(1) = mean(LAC23_P_data.d13C_DIC_permil_);
 d13C_org_model = -8*ones(length(t_hr),1);
@@ -143,8 +161,10 @@ d13C_org_mean = -8; %{permil}
 %run diurnal engine
 for nn = 2:length(t_hr)
     delta_t_model = t_hr(nn) - t_hr(nn-1); %{hr}
-    Fcarb_model(nn) = k_rate*(Omega_ar_model(nn-1) -1)^n_BR*10^6/waterdensity/waterdepth; %{umol/kg/hr}
-    Fgas_model(nn) = kCO2*K0*(pCO2_model(nn-1) - pCO2_atm)/waterdensity/waterdepth; %{umol/kg/hr}
+    Fcarb_model(nn) = k_rate*(Omega_ar_model(nn-1) -1)^n_BR*10^6/...
+        waterdensity/waterdepth; %{umol/kg/hr}
+    Fgas_model(nn) = kCO2*K0*(pCO2_model(nn-1) - pCO2_atm)/waterdensity/...
+        waterdepth; %{umol/kg/hr}
     DIC_model(nn) = DIC_model(nn-1) - (photo(nn) + ...
         (Fcarb_model(nn) + Fgas_model(nn)))*delta_t_model;
     Alk_model(nn) = Alk_model(nn-1) - 2*Fcarb_model(nn)*delta_t_model;
@@ -240,7 +260,7 @@ scatter(hours(timeM),LAC23_M_data.Alk_mequiv_kg_,'.r')
 yline(mean(LAC23_P_data.Alk_mequiv_kg_),'k')
 yline(mean(Trower2018data.Alk_mmol_kg_),'b')
 xlim([0 24])
-ylim([2.4 2.55])
+ylim([2.35 2.5])
 xlabel('hour of day')
 ylabel('Alk (mmol/kg)')
 xline(hours(timeofday(lowtide1)),'--k')
@@ -282,7 +302,7 @@ xline(hours(timeofday(hightide2)),'-.k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
 xlim([0 24])
-ylim([200 550])
+ylim([150 550])
 xlabel('hour of day')
 ylabel('pCO_2 (\muatm)')
 
