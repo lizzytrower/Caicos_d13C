@@ -1,7 +1,7 @@
 %% Little Ambergris Cay diurnal engine + Suess effect evaluation
 % This code was written by Lizzy Trower in Matlab R2021b based on the
 % description of the diurnal engine model from Geyman and Maloof (2019). It
-% was last updated in October 2023.
+% was last updated in February 2024.
 
 %This code requires a few additional functions to run: 
 %   *aragoniteinterp (which calculates k and n based on T, using Burton &
@@ -17,8 +17,8 @@
 clear
 
 %load data from dataset spreadsheets
-LAC23_P_data = readtable('DatasetS1_platformdata.xlsx');
-LAC23_M_data = readtable('DatasetS2_matdata.xlsx');
+LAC23_P_data = readtable('DatasetS1_platformdata_update.xlsx');
+LAC23_M_data = readtable('DatasetS2_matdata_update.xlsx');
 
 %create time of day duration vectors
 time = timeofday(LAC23_P_data.time);
@@ -62,7 +62,7 @@ end
 delta_pCO2 = delta_pCO2*10^-6; %{atm}
 
 %gas exchange calculations
-tempC = 25; %{°C}
+tempC = 26.8; %{°C}
 tempK = tempC + 273; %{K}
 
 K0 = exp(-58.0931 + 90.5697*(100/tempK) + 22.294*log(tempK/100) + ...
@@ -134,7 +134,7 @@ k_rate = k_rate*60*60; %{mol/m^2/hr}
 eps_DIC_ar = 2.7;
 eps_g_DIC = -2;
 eps_DIC_g = -10.3;
-eps_DIC_org = -10;
+eps_DIC_org = -15;
 
 %set up carbonate chemistry variables
 DIC_model = zeros(length(t_hr),1);
@@ -168,7 +168,7 @@ for nn = 2:length(t_hr)
     DIC_model(nn) = DIC_model(nn-1) - (photo(nn) + ...
         (Fcarb_model(nn) + Fgas_model(nn)))*delta_t_model;
     Alk_model(nn) = Alk_model(nn-1) - 2*Fcarb_model(nn)*delta_t_model;
-    recalcCO2SYS = CO2SYS(DIC_model(nn),Alk_model(nn),2,1,35,tempC,nan,0,nan,...
+    recalcCO2SYS = CO2SYS(DIC_model(nn),Alk_model(nn),2,1,37.4,tempC,nan,0,nan,...
     0,0,0,0,1,4,1,1,1);
     pCO2_model(nn) = recalcCO2SYS(4);
     pH_model(nn) = recalcCO2SYS(3);
@@ -252,6 +252,11 @@ xlabel('hour of day')
 ylabel('[DIC] (mmol/kg)')
 xlim([0 24])
 
+DIC_rescale = interp1(t_hr,DIC_model/1000,hours(time));
+SSE_DIC = sum((LAC23_P_data.DIC_mmol_kg_ - DIC_rescale).^2);
+SST_DIC = sum((LAC23_P_data.DIC_mmol_kg_ - mean(LAC23_P_data.DIC_mmol_kg_)).^2);
+Rsq_DIC = 1 - (SSE_DIC/SST_DIC);
+
 nexttile
 plot(t_hr,Alk_model/1000,'--k')
 hold on
@@ -271,6 +276,11 @@ xline(hours(timeofday(lowtide3)),'--k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
 
+Alk_rescale = interp1(t_hr,Alk_model/1000,hours(time));
+SSE_Alk = sum((LAC23_P_data.Alk_mequiv_kg_ - Alk_rescale).^2);
+SST_Alk = sum((LAC23_P_data.Alk_mequiv_kg_ - mean(LAC23_P_data.Alk_mequiv_kg_)).^2);
+Rsq_Alk = 1 - (SSE_Alk/SST_Alk);
+
 nexttile
 plot(t_hr,pH_model,'--k')
 hold on
@@ -286,6 +296,11 @@ xlim([0 24])
 ylim([7.9 8.3])
 xlabel('hour of day')
 ylabel('pH')
+
+pH_rescale = interp1(t_hr,pH_model,hours(time));
+SSE_pH = sum((LAC23_P_data.pH - pH_rescale).^2);
+SST_pH = sum((LAC23_P_data.pH - mean(LAC23_P_data.pH)).^2);
+Rsq_pH = 1 - (SSE_pH/SST_pH);
 
 nexttile
 plot(t_hr,pCO2_model,'--k')
@@ -306,6 +321,11 @@ ylim([150 550])
 xlabel('hour of day')
 ylabel('pCO_2 (\muatm)')
 
+pCO2_rescale = interp1(t_hr,pCO2_model,hours(time));
+SSE_pCO2 = sum((LAC23_P_data.pCO2_uatm_ - pCO2_rescale).^2);
+SST_pCO2 = sum((LAC23_P_data.pCO2_uatm_ - mean(LAC23_P_data.pCO2_uatm_)).^2);
+Rsq_pCO2 = 1 - (SSE_pCO2/SST_pCO2);
+
 nexttile
 plot(t_hr,Omega_ar_model,'--k')
 hold on
@@ -318,9 +338,14 @@ xline(hours(timeofday(hightide2)),'-.k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
 xlim([0 24])
-ylim([3 5.5])
+ylim([3 6])
 xlabel('hour of day')
 ylabel('\Omega_{ar}')
+
+Omega_rescale = interp1(t_hr,Omega_ar_model,hours(time));
+SSE_Omega = sum((LAC23_P_data.Omega_ar_CO2SYS_ - Omega_rescale).^2);
+SST_Omega = sum((LAC23_P_data.Omega_ar_CO2SYS_ - mean(LAC23_P_data.Omega_ar_CO2SYS_)).^2);
+Rsq_Omega = 1 - (SSE_Omega/SST_Omega);
 
 nexttile
 plot(t_hr,d13C_DIC_model,'--k')
@@ -337,6 +362,11 @@ xlim([0 24])
 ylim([0.1 1.3])
 xlabel('hour of day')
 ylabel('\delta^{13}C_{DIC}')
+
+d13C_rescale = interp1(t_hr,d13C_DIC_model,hours(time));
+SSE_d13C = sum((LAC23_P_data.d13C_DIC_permil_ - d13C_rescale).^2);
+SST_d13C = sum((LAC23_P_data.d13C_DIC_permil_ - mean(LAC23_P_data.d13C_DIC_permil_)).^2);
+Rsq_d13C = 1 - (SSE_d13C/SST_d13C);
 
 %plot model drivers
 figure
@@ -447,7 +477,7 @@ nexttile
 yyaxis left
 scatter(time_sort,R_BR,'.')
 box on
-ylim([100 350])
+ylim([100 500])
 ylabel('R_a_r (\mumol/m^2/hr)')
 yyaxis right
 scatter(time_sort,CR_BR,'.')

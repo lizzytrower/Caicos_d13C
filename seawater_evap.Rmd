@@ -1,0 +1,304 @@
+---
+title: "Caicos platform seawater evaporation model"
+output: html_notebook
+---
+
+In this notebook we use PHREEQC to model how evaporation of seawater from Caicos Platform would change $\Omega$ and other carbonate chemistry parameters.
+
+```{r}
+#set up variables
+tempC <- 30 #degrees C
+#all concentrations here are in mmol/kgw
+DIC <- 2.04
+Alk <- 2.38
+cCa <- 10
+cMg <- 56
+cNa <- 498
+cK <- 14
+cCl <- 599
+cSO4 <- 30.54
+
+#preallocate space for variables in evaporation model
+evap_factor <- seq(from = 1, to = 0.5, by = -0.005)
+pH_out <- numeric(length(evap_factor))
+DIC_out <- numeric(length(evap_factor))
+Alk_out <- numeric(length(evap_factor))
+pCO2_out <- numeric(length(evap_factor))
+Omega_arag_out <- numeric(length(evap_factor))
+Na_out <- numeric(length(evap_factor))
+Ca_out <- numeric(length(evap_factor))
+Mg_out <- numeric(length(evap_factor))
+K_out <- numeric(length(evap_factor))
+Cl_out <- numeric(length(evap_factor))
+SO4_out <- numeric(length(evap_factor))
+
+library(phreeqc)
+phrLoadDatabaseString(pitzer.dat)
+phrSetOutputStringsOn(TRUE)
+
+#initial calculation to get starting point
+input1 <- c(   
+    '  SOLUTION 1 Caicos platform water',
+    '  units         mmol/kgw',
+    paste('  temp              ',as.character(tempC)),
+    paste('  Alkalinity        ',as.character(Alk)),
+    paste('  C(4)              ',as.character(DIC)),
+    paste('  Ca                ',as.character(cCa)),
+    paste('  Mg                ',as.character(cMg)),
+    paste('  Na                ',as.character(cNa)),
+    paste('  K                 ',as.character(cK)),
+    paste('  Cl                ',as.character(cCl)),
+    paste('  S(6)              ',as.character(cSO4)),
+
+    'SELECTED_OUTPUT       ',
+    '  -high precision   TRUE',
+    '  -pH               TRUE',
+    '  -si               aragonite',
+    '  -Alkalinity       TRUE',
+    '  -totals           C(4)',
+    '  -molalities       Na+ Ca+2 Mg+2 K+ Cl- SO4-2 H+ HSO4-',
+    '  -si               CO2(g)')
+
+phrRunString(input1)
+output1 <- phrGetSelectedOutput()
+
+#populate initial data
+#this line will convert pH to total scale rather than the NBS scale
+pH_out[1] <- -log10(output1$n1$m_H..mol.kgw. + output1$n1$m_HSO4..mol.kgw.)
+DIC_out[1] <- output1$n1$C.4..mol.kgw.*1000
+Alk_out[1] <- output1$n1$Alk.eq.kgw.*1000
+pCO2_out[1] <- 10^output1$n1$si_CO2.g.
+Omega_arag_out[1] <- 10^output1$n1$si_aragonite
+Na_out[1] <- cNa
+Ca_out[1] <- cCa
+Mg_out[1] <- cMg
+K_out[1] <- cK
+Cl_out[1] <- cCl
+SO4_out[1] <- cSO4
+
+
+#set up for loop to run evaporation calculations for a variety of evaporation factors representing how much evap would be required to shift salinity from 35 to 40
+
+for (n in 2:length(evap_factor)) {
+#This is how many moles of H2O we start with (because PHREEQC defines the system as 1 kg of H2O):
+init_H2O_mol <- 55.506
+
+#Then we  determine how many moles of H2O will be left after evaporation:
+evap_H2O_mol <- init_H2O_mol*evap_factor[n]
+
+#Then we figure out how much water needs to be removed for this evaporation step by subtracting the final from the initial amount of water:
+H2O_loss <- init_H2O_mol - evap_H2O_mol
+
+#now we can use this calculation to drive PHREEQC:
+
+  input2 <- c(                            
+    '  SOLUTION 1',   
+    '  units         mmol/kgw',
+    paste('  temp              ',as.character(tempC)),
+    paste('  Alkalinity        ',as.character(Alk)),
+    paste('  C(4)              ',as.character(DIC)),          
+    paste('  Ca                ',as.character(cCa)),
+    paste('  Mg                ',as.character(cMg)),
+    paste('  Na                ',as.character(cNa)),
+    paste('  K                 ',as.character(cK)),
+    paste('  Cl                ',as.character(cCl)),
+    paste('  S(6)              ',as.character(cSO4)),
+    
+#in this step, we use the REACTION code block to remove the amount of water we calculated at the beginning
+    ' REACTION 1',
+    '    H2O     -1.0',
+    paste(as.character(H2O_loss), 'moles'),
+  ' SAVE solution 2',
+  ' END')
+#add step to degas CO2 (but don't let it invade) if its above 420
+  
+phrRunString(input2)
+output2 <- phrGetSelectedOutput()
+pH_out[n] <- -log10(output2$n1$m_H..mol.kgw.[2] + output2$n1$m_HSO4..mol.kgw.[2])
+DIC_out[n] <- output2$n1$C.4..mol.kgw.[2]*1000
+Alk_out[n] <- output2$n1$Alk.eq.kgw.[2]*1000
+pCO2_out[n] <- 10^output2$n1$si_CO2.g.[2]
+Omega_arag_out[n] <- 10^output2$n1$si_aragonite[2]
+Na_out[n] <- output2$n1$m_Na..mol.kgw.[2]*1000
+Ca_out[n] <- output2$n1$m_Ca.2.mol.kgw.[2]*1000
+Mg_out[n] <- output2$n1$m_Mg.2.mol.kgw.[2]*1000
+K_out[n] <- output2$n1$m_K..mol.kgw.[2]*1000
+Cl_out[n] <- output2$n1$m_Cl..mol.kgw.[2]*1000
+SO4_out[n] <- output2$n1$m_SO4.2.mol.kgw.[2]*1000
+
+}
+
+sal <- 37/evap_factor
+
+evapdata <- data.frame(
+  evap_factor,
+  sal,
+  pH_out,
+  pCO2_out,
+  DIC_out,
+  Alk_out,
+  Omega_arag_out,
+  Na_out,
+  Ca_out,
+  Mg_out,
+  K_out,
+  Cl_out,
+  SO4_out
+)
+
+print(evapdata$Omega_arag_out)
+
+write.csv(evapdata,'PHREEQCevapdata.csv')
+```
+
+Same code but now implementing CO2 degassing:
+
+```{r}
+#set up variables
+tempC <- 30 #degrees C
+#all concentrations here are in mmol/kgw
+DIC <- 2.04
+Alk <- 2.38
+cCa <- 10
+cMg <- 56
+cNa <- 498
+cK <- 14
+cCl <- 599
+cSO4 <- 30.54
+
+#preallocate space for variables in evaporation model
+evap_factor <- seq(from = 1, to = 0.5, by = -0.005)
+pH_out <- numeric(length(evap_factor))
+DIC_out <- numeric(length(evap_factor))
+Alk_out <- numeric(length(evap_factor))
+pCO2_out <- numeric(length(evap_factor))
+Omega_arag_out <- numeric(length(evap_factor))
+Na_out <- numeric(length(evap_factor))
+Ca_out <- numeric(length(evap_factor))
+Mg_out <- numeric(length(evap_factor))
+K_out <- numeric(length(evap_factor))
+Cl_out <- numeric(length(evap_factor))
+SO4_out <- numeric(length(evap_factor))
+
+library(phreeqc)
+phrLoadDatabaseString(pitzer.dat)
+phrSetOutputStringsOn(TRUE)
+
+#initial calculation to get starting point
+input1 <- c(   
+    '  SOLUTION 1 Caicos platform water',
+    '  units         mmol/kgw',
+    paste('  temp              ',as.character(tempC)),
+    paste('  Alkalinity        ',as.character(Alk)),
+    paste('  C(4)              ',as.character(DIC)),
+    paste('  Ca                ',as.character(cCa)),
+    paste('  Mg                ',as.character(cMg)),
+    paste('  Na                ',as.character(cNa)),
+    paste('  K                 ',as.character(cK)),
+    paste('  Cl                ',as.character(cCl)),
+    paste('  S(6)              ',as.character(cSO4)),
+
+    'SELECTED_OUTPUT       ',
+    '  -high precision   TRUE',
+    '  -pH               TRUE',
+    '  -si               aragonite',
+    '  -Alkalinity       TRUE',
+    '  -totals           C(4)',
+    '  -molalities       Na+ Ca+2 Mg+2 K+ Cl- SO4-2 H+ HSO4-',
+    '  -si               CO2(g)')
+
+phrRunString(input1)
+output1 <- phrGetSelectedOutput()
+
+#populate initial data
+pH_out[1] <- -log10(output1$n1$m_H..mol.kgw. + output1$n1$m_HSO4..mol.kgw.)
+DIC_out[1] <- output1$n1$C.4..mol.kgw.*1000
+Alk_out[1] <- output1$n1$Alk.eq.kgw.*1000
+pCO2_out[1] <- 10^output1$n1$si_CO2.g.
+Omega_arag_out[1] <- 10^output1$n1$si_aragonite
+Na_out[1] <- cNa
+Ca_out[1] <- cCa
+Mg_out[1] <- cMg
+K_out[1] <- cK
+Cl_out[1] <- cCl
+SO4_out[1] <- cSO4
+
+
+#set up for loop to run evaporation calculations for a variety of evaporation factors representing how much evap would be required to shift salinity from 35 to 40
+
+for (n in 2:length(evap_factor)) {
+#This is how many moles of H2O we start with (because PHREEQC defines the system as 1 kg of H2O):
+init_H2O_mol <- 55.506
+
+#Then we  determine how many moles of H2O will be left after evaporation:
+evap_H2O_mol <- init_H2O_mol*evap_factor[n]
+
+#Then we figure out how much water needs to be removed for this evaporation step by subtracting the final from the initial amount of water:
+H2O_loss <- init_H2O_mol - evap_H2O_mol
+
+#now we can use this calculation to drive PHREEQC:
+
+  input2 <- c(                            
+    '  SOLUTION 1',   
+    '  units         mmol/kgw',
+    paste('  temp              ',as.character(tempC)),
+    paste('  Alkalinity        ',as.character(Alk)),
+    paste('  C(4)              ',as.character(DIC)),          
+    paste('  Ca                ',as.character(cCa)),
+    paste('  Mg                ',as.character(cMg)),
+    paste('  Na                ',as.character(cNa)),
+    paste('  K                 ',as.character(cK)),
+    paste('  Cl                ',as.character(cCl)),
+    paste('  S(6)              ',as.character(cSO4)),
+    
+#in this step, we use the REACTION code block to remove the amount of water we calculated at the beginning
+    ' REACTION 1',
+    '    H2O     -1.0',
+    paste(as.character(H2O_loss), 'moles'),
+  ' SAVE solution 2',
+  ' END',
+
+  ' EQUILIBRIUM_PHASES',
+  '  CO2(g)  -3.38   10.0  precipitate_only',
+  ' USE solution 2',
+  ' END')
+#add step to degas CO2 (but don't let it invade) if its above 420
+  
+phrRunString(input2)
+output2 <- phrGetSelectedOutput()
+pH_out[n] <- -log10(output2$n1$m_H..mol.kgw.[3] + output2$n1$m_HSO4..mol.kgw.[3])
+DIC_out[n] <- output2$n1$C.4..mol.kgw.[3]*1000
+Alk_out[n] <- output2$n1$Alk.eq.kgw.[3]*1000
+pCO2_out[n] <- 10^output2$n1$si_CO2.g.[3]
+Omega_arag_out[n] <- 10^output2$n1$si_aragonite[3]
+Na_out[n] <- output2$n1$m_Na..mol.kgw.[3]*1000
+Ca_out[n] <- output2$n1$m_Ca.2.mol.kgw.[3]*1000
+Mg_out[n] <- output2$n1$m_Mg.2.mol.kgw.[3]*1000
+K_out[n] <- output2$n1$m_K..mol.kgw.[3]*1000
+Cl_out[n] <- output2$n1$m_Cl..mol.kgw.[3]*1000
+SO4_out[n] <- output2$n1$m_SO4.2.mol.kgw.[3]*1000
+
+}
+
+sal <- 37/evap_factor
+
+evapdata <- data.frame(
+  evap_factor,
+  sal,
+  pH_out,
+  pCO2_out,
+  DIC_out,
+  Alk_out,
+  Omega_arag_out,
+  Na_out,
+  Ca_out,
+  Mg_out,
+  K_out,
+  Cl_out,
+  SO4_out
+)
+
+print(evapdata$Omega_arag_out)
+
+write.csv(evapdata,'PHREEQCevapdata_CO2degas.csv')
+```
