@@ -1,7 +1,7 @@
 %% Little Ambergris Cay diurnal engine + Suess effect evaluation
 % This code was written by Lizzy Trower in Matlab R2021b based on the
 % description of the diurnal engine model from Geyman and Maloof (2019). It
-% was last updated in February 2024.
+% was last updated in April 2024.
 
 %This code requires a few additional functions to run: 
 %   *aragoniteinterp (which calculates k and n based on T, using Burton &
@@ -18,20 +18,17 @@ clear
 
 %load data from dataset spreadsheets
 LAC23_P_data = readtable('DatasetS1_platformdata_update.xlsx');
-LAC23_M_data = readtable('DatasetS2_matdata_update.xlsx');
 
 %create time of day duration vectors
 time = timeofday(LAC23_P_data.time);
-timeM = timeofday(LAC23_M_data.time);
 
-%% Part 2: plot raw Alk vs DIC data from platform
+%% Part 2: plot raw Alk vs DIC data
 figure
 plot(LAC23_P_data.DIC_mmol_kg_,LAC23_P_data.Alk_mequiv_kg_,'k')
 hold on
 scatter(LAC23_P_data.DIC_mmol_kg_,LAC23_P_data.Alk_mequiv_kg_,[],...
     hours(time),'filled')
 box on
-xlim([1.96 2.14])
 axis equal
 ylabel('TA (mequiv/kg)')
 xlabel('[DIC] (mmol/kg)')
@@ -121,7 +118,7 @@ kappa_p = deltaDIC + deltaCO2_net - 0.5*delta_Alk; %{umol/kg}
 t_hr = 0:0.1:24;
 time_DT = datetime(2023,7,28,0,0,0) + hours(t_hr);
 period = 24; %{hr}
-offset = 5; %{hr} when the sine curve will cross 0
+offset = 4; %{hr} when the sine curve will cross 0
 kappa_p_factor = kappa_p/(period/pi()); %{umol/kg/hr}
 photo = kappa_p_factor*sin((2*pi()/period)*(t_hr-offset)); %{umol/kg/hr}
 
@@ -134,19 +131,24 @@ k_rate = k_rate*60*60; %{mol/m^2/hr}
 eps_DIC_ar = 2.7;
 eps_g_DIC = -2;
 eps_DIC_g = -10.3;
-eps_DIC_org = -15;
+eps_DIC_org = -10;
 
 %set up carbonate chemistry variables
 DIC_model = zeros(length(t_hr),1);
-DIC_model(1) = mean(LAC23_P_data.DIC_mmol_kg_)*1000; %{umol/kg}
+DIC_model(1) = 2070;
+%DIC_model(1) = mean(LAC23_P_data.DIC_mmol_kg_)*1000; %{umol/kg}
 Alk_model = zeros(length(t_hr),1);
-Alk_model(1) = mean(LAC23_P_data.Alk_mequiv_kg_)*1000; %{umol/kg}
+Alk_model(1) = 2400;
+%Alk_model(1) = mean(LAC23_P_data.Alk_mequiv_kg_)*1000; %{umol/kg}
 pCO2_model = zeros(length(t_hr),1);
-pCO2_model(1) = mean(LAC23_P_data.pCO2_uatm_); %{uatm}
+pCO2_model(1) = 440;
+%pCO2_model(1) = mean(LAC23_P_data.pCO2_uatm_); %{uatm}
 pH_model = zeros(length(t_hr),1);
-pH_model(1) = mean(LAC23_P_data.pH); %{dimensionless}
+pH_model(1) = 8.02;
+%pH_model(1) = mean(LAC23_P_data.pH); %{dimensionless}
 Omega_ar_model = zeros(length(t_hr),1);
-Omega_ar_model(1) = mean(LAC23_P_data.Omega_ar_CO2SYS_);
+Omega_ar_model(1) = 3.7;
+%Omega_ar_model(1) = mean(LAC23_P_data.Omega_ar_CO2SYS_);
 Fcarb_model = zeros(length(t_hr),1);
 Fcarb_model(1) = k_rate*(Omega_ar_model(1) - 1)^n_BR*10^6/...
     waterdensity/waterdepth; %{umol/kg/hr}
@@ -154,7 +156,8 @@ Fgas_model = zeros(length(t_hr),1);
 Fgas_model(1) = kCO2*K0*(pCO2_model(1) - pCO2_atm)/waterdensity/...
     waterdepth; %{umol/kg/hr}
 d13C_DIC_model = zeros(length(t_hr),1);
-d13C_DIC_model(1) = mean(LAC23_P_data.d13C_DIC_permil_);
+d13C_DIC_model(1) = 0.5;
+%d13C_DIC_model(1) = mean(LAC23_P_data.d13C_DIC_permil_);
 d13C_org_model = -8*ones(length(t_hr),1);
 d13C_org_mean = -8; %{permil}
 
@@ -240,14 +243,13 @@ nexttile
 plot(t_hr,DIC_model/1000,'--k')
 hold on
 scatter(hours(time),LAC23_P_data.DIC_mmol_kg_,'.k')
-scatter(hours(timeM),LAC23_M_data.DIC_mmol_kg_,'.r')
 yline(mean(LAC23_P_data.DIC_mmol_kg_),'k')
 yline(mean(Trower2018data.DIC_mmol_kg_),'b')
 xline(hours(timeofday(hightide1)),'-.k')
 xline(hours(timeofday(hightide2)),'-.k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
-ylim([1.9 2.2])
+ylim([1.9 2.15])
 xlabel('hour of day')
 ylabel('[DIC] (mmol/kg)')
 xlim([0 24])
@@ -261,11 +263,10 @@ nexttile
 plot(t_hr,Alk_model/1000,'--k')
 hold on
 scatter(hours(time),LAC23_P_data.Alk_mequiv_kg_,'.k')
-scatter(hours(timeM),LAC23_M_data.Alk_mequiv_kg_,'.r')
 yline(mean(LAC23_P_data.Alk_mequiv_kg_),'k')
 yline(mean(Trower2018data.Alk_mmol_kg_),'b')
 xlim([0 24])
-ylim([2.35 2.5])
+ylim([2.35 2.45])
 xlabel('hour of day')
 ylabel('Alk (mmol/kg)')
 xline(hours(timeofday(lowtide1)),'--k')
@@ -285,7 +286,6 @@ nexttile
 plot(t_hr,pH_model,'--k')
 hold on
 scatter(hours(time),LAC23_P_data.pH,'.k')
-scatter(hours(timeM),LAC23_M_data.pH,'.r')
 yline(mean(LAC23_P_data.pH),'k')
 yline(mean(Trower2018data.pH),'b')
 xline(hours(timeofday(hightide1)),'-.k')
@@ -293,7 +293,7 @@ xline(hours(timeofday(hightide2)),'-.k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
 xlim([0 24])
-ylim([7.9 8.3])
+ylim([7.95 8.2])
 xlabel('hour of day')
 ylabel('pH')
 
@@ -306,7 +306,6 @@ nexttile
 plot(t_hr,pCO2_model,'--k')
 hold on
 scatter(hours(time),LAC23_P_data.pCO2_uatm_,'.k')
-scatter(hours(timeM),LAC23_M_data.pCO2_uatm_,'.r')
 yline(mean(LAC23_P_data.pCO2_uatm_),'k')
 [Trower2018_co2sys,Trower2018_co2sys_headers] = CO2SYS(Trower2018data.pH,...
     Trower2018data.Alk_mmol_kg_*1000,3,1,Trower2018data.salinity_ppt_,25,nan,0,nan,...
@@ -317,7 +316,7 @@ xline(hours(timeofday(hightide2)),'-.k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
 xlim([0 24])
-ylim([150 550])
+ylim([250 550])
 xlabel('hour of day')
 ylabel('pCO_2 (\muatm)')
 
@@ -330,7 +329,6 @@ nexttile
 plot(t_hr,Omega_ar_model,'--k')
 hold on
 scatter(hours(time),LAC23_P_data.Omega_ar_CO2SYS_,'.k')
-scatter(hours(timeM),LAC23_M_data.Omega_ar_CO2SYS_,'.r')
 yline(mean(LAC23_P_data.Omega_ar_CO2SYS_),'--')
 yline(mean(Trower2018_co2sys(:,18)),'b')
 xline(hours(timeofday(hightide1)),'-.k')
@@ -338,7 +336,7 @@ xline(hours(timeofday(hightide2)),'-.k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
 xlim([0 24])
-ylim([3 6])
+ylim([3.2 5])
 xlabel('hour of day')
 ylabel('\Omega_{ar}')
 
@@ -351,7 +349,6 @@ nexttile
 plot(t_hr,d13C_DIC_model,'--k')
 hold on
 scatter(hours(time),LAC23_P_data.d13C_DIC_permil_,'.k')
-scatter(hours(timeM),LAC23_M_data.d13C_DIC_permil_,'.r')
 yline(mean(LAC23_P_data.d13C_DIC_permil_),'--')
 yline(mean(Trower2018data.d13C_DIC),'k')
 xline(hours(timeofday(hightide1)),'-.k')
@@ -359,7 +356,7 @@ xline(hours(timeofday(hightide2)),'-.k')
 xline(hours(timeofday(dawn)),'--g')
 xline(hours(timeofday(dusk)),'--g')
 xlim([0 24])
-ylim([0.1 1.3])
+ylim([0.2 1.3])
 xlabel('hour of day')
 ylabel('\delta^{13}C_{DIC}')
 
@@ -368,7 +365,6 @@ SSE_d13C = sum((LAC23_P_data.d13C_DIC_permil_ - d13C_rescale).^2);
 SST_d13C = sum((LAC23_P_data.d13C_DIC_permil_ - mean(LAC23_P_data.d13C_DIC_permil_)).^2);
 Rsq_d13C = 1 - (SSE_d13C/SST_d13C);
 
-%plot model drivers
 figure
 tiledlayout(3,1)
 nexttile
@@ -396,6 +392,7 @@ xlabel('hour of day')
 yline(0)
 hold on
 xlim([0 24])
+ylim([-0.4 0.3])
 
 
 %% Part 6: estimate d13C_carb

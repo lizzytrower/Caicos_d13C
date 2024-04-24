@@ -6,9 +6,11 @@ calT = [5, 25, 37];
 k = interp1(calT, calk, temp);
 n = interp1(calT, caln, temp);
 
-if temp > 37
-    k = 45.1;
-    n = 2.4;
+for j = 1:length(temp)
+    if temp(j) > 37
+        k(j) = 45.1;
+        n(j) = 2.4;
+    end
 end
 
 end
